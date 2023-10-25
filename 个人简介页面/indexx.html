@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="navbar">
+        <a href="#" class="logo">HPR</a>
+        <ul class="nav">
+            <li><a href="#about">ABOUT ME</a></li>
+            <li><a href="#mock">MOCK</a></li>
+            <!-- <li><a href="#exper">EXPERIENCE</a></li> -->
+            <li><a href="#game">GAME</a></li>
+        </ul>
+    </div>
+    <div class="banner-area" id="home">
+        <div class="container">
+            <div class="box" id="box1">
+                <img src="http://code.5g-o.com/wp-content/uploads/2020/02/h1.jpg" alt="">
+                <span>css</span>
+            </div>
+
+            <div class="box" id="box2">
+                <img src="https://code.5g-o.com/wp-content/uploads/2020/02/h2.jpg" alt="">
+                <span>creative</span>
+            </div>
+
+
+            <div class="box" id="box3">
+                <img src="https://code.5g-o.com/wp-content/uploads/2020/02/h3.jpg" alt="">
+                <span>hover</span>
+            </div>
+
+
+            <div class="box" id="box4">
+                <img src="https://code.5g-o.com/wp-content/uploads/2020/02/girl-1561989_1920.jpg" alt="">
+                <span>hover</span>
+            </div>
+
+        </div>
+    </div>
+    <div class="about-area" id="about">
+        <h1 id="aboutmeh1">ABOUT ME</h1>
+        <div class="text-part">
+            <div class="photo"></div>
+            <div class="introduce1">
+                <li id="li1">黄鹏叡</li>
+                <li id="li2">2022级</li>
+                <li id="li3">信息与软件工程学院</li>
+                <li id="li4">Phone:13002369661</li>
+                <li id="li5">QQ:2388245517</li>
+            </div>
+            <div class="introduce2">
+                <div class="sy">
+                    <h2 class="syp">爱摄影</h2>
+                </div>
+                <div class="sp">
+                    <h2 class="spp">爱运动</h2>
+                </div>
+                <div class="ms">
+                    <h2 class="msp">更爱 美食</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="inter-area" id="mock">
+        <div class="text-part2">
+            <h1>MOCK 模拟获取虚拟货币价格</h1>
+            <div class="num1">
+                <div class="main">
+                    <h6 class="name">DOGE/USD</h6>
+                    <h4 class="result" id="res1">111</h4>
+                    <span class="pt">binance</span>
+                    <button class="btn" id="btn1">change</button>
+                </div>
+                <div class="main">
+                    <h6 class="name">BTC</h6>
+                    <h4 class="result" id="res2">111</h4>
+                    <span class="pt">binance</span>
+                    <button class="btn" id="btn2">change</button>
+                </div>
+                <div class="main">
+                    <h6 class="name">ETH</h6>
+                    <h4 class="result" id="res3">111</h4>
+                    <span class="pt">binance</span>
+                    <button class="btn" id="btn3">change</button>
+                </div>
+            </div>
+            <div class="num2">
+                <div class="main">
+                    <h6 class="name">BNB</h6>
+                    <h4 class="result" id="res4">111</h4>
+                    <span class="pt">binance</span>
+                    <button class="btn" id="btn4">change</button>
+                </div>
+                <div class="main">
+                    <h6 class="name">USDT</h6>
+                    <h4 class="result" id="res5">111</h4>
+                    <span class="pt">binance</span>
+                    <button class="btn" id="btn5">change</button>
+                </div>
+                <div class="main">
+                    <h6 class="name">XRP</h6>
+                    <h4 class="result" id="res6">111</h4>
+                    <span class="pt">binance</span>
+                    <button class="btn" id="btn6">change</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-area" id="game">
+        <div class="text-part">
+            <a href="../弹球游戏/index.html" id="tq">弹球游戏<br> 启动！</a>
+        </div>
+    </div>
+    <script>
+        window.onload = function () {
+            var res = [];
+            res[0] = document.getElementById('res1');
+            res[1] = document.getElementById('res2');
+            res[2] = document.getElementById('res3');
+            res[3] = document.getElementById('res4');
+            res[4] = document.getElementById('res5');
+            res[5] = document.getElementById('res6');
+            function kkk() {
+                for (var i = 0; i <= 5; i++) {
+                    setfresh(res[i]);
+                }
+            }
+            function setfresh(res) {
+                var num = Math.ceil(Math.random() * 50);
+                //1.创建对象
+                const xhr = new XMLHttpRequest();
+                //2.设置请求方法和url
+                xhr.open('GET', 'https://65267acd917d673fd76c5d93.mockapi.io/get_price' + '/' + num);
+                //3.发送
+                xhr.send();
+                //4.事件绑定返回结果
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {//服务端返回了所有结果
+                        if (xhr.status >= 200 && xhr.status <= 300) {
+                            var data = JSON.parse(xhr.response);
+                            res.innerHTML = data.price;
+                            if (data.price >= 600)
+                                res.style.color = 'red';
+                            else
+                                res.style.color = '#0ECB81';
+                        }
+                    }
+                }
+            }
+            setInterval(kkk, 3000);
+        }
+    </script>
+</body>
+
+</html>
