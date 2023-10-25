@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        #board {
+            width: 650px;
+            height: 440px;
+            border: 1px solid black;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        #paddle {
+            width: 80px;
+            height: 15px;
+            background-color: rgb(146, 188, 248);
+            position: absolute;
+            bottom: 0;
+        }
+
+        #ball {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: rgb(146, 188, 248);
+            position: absolute;
+        }
+
+        .brick {
+            width: 75px;
+            height: 20px;
+            background-color: rgb(146, 188, 248);
+            border: 1px solid black;
+            position: absolute;
+        }
+
+        #brick-container {
+            margin-top: 30px;
+        }
+
+        #scoreboard {
+            position: relative;
+            width: 70px;
+            margin: 0 auto;
+        }
+
+        #score {
+            font-size: 24px;
+            text-align: center;
+        }
+
+        #btn {
+            position: relative;
+            margin: 0 auto;
+            width: 90px;
+        }
+
+        #start {
+            width: 90px;
+            height: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>弹力球游戏</h1>
+    <div id="board">
+        <div id="paddle"></div>
+        <div id="ball"></div>
+        <div id="brick-container"></div>
+    </div>
+    <div id="scoreboard">得分：<span id="score">0</span>
+    </div>
+
+    <div id="btn"><button id="start">开始游戏</button></div>
+</body>
+
+<script>
+    let board, paddle, ball;
+    let px, bx, by;
+    let brickWidth = 75, brickHeight = 20, brickPadding = 10, brickTop = 30, brickLeft = 30;
+    let row = 5, column = 7;
+    let x, y;
+    let leftPressed, rightPressed;
+    let score = 0; // 定义分数
+
+    let gameLoop;
+
+    //获取元素
+    const start = document.getElementById('start');
+
+    board = document.getElementById("board");
+    paddle = document.getElementById("paddle");
+    ball = document.getElementById("ball");
+
+    const brickContainer = document.getElementById("brick-container");
+
+    //初始化键盘事件
+    document.addEventListener("keydown", down, false);
+    document.addEventListener("keyup", up, false);
+    start.addEventListener("click", startGame);
+    //开始
+    function startGame() {
+        x = Math.random() * 2 + 2;
+        y = -(Math.random() * 2 + 2);
+
+        leftPressed = false;
+        rightPressed = false;
+
+        score = 0;
+        document.getElementById("score").innerHTML = score;
+
+        px = board.offsetWidth / 2 - paddle.offsetWidth / 2;
+        bx = board.offsetWidth / 2 - ball.offsetWidth / 2;
+        by = board.offsetHeight / 2 - ball.offsetHeight / 2;
+        ball.style.left = bx + "px";
+        ball.style.top = by + "px";
+
+        brickContainer.innerHTML = "";
+        for (let i = 0; i < row; i++) {
+            for (let j = 0; j < column; j++) {
+                const brick = document.createElement("div");
+                brick.className = "brick";
+                brick.style.left = j * (brickWidth + brickPadding) + brickLeft + "px";
+                brick.style.top = i * (brickHeight + brickPadding) + brickTop + "px";
+                brickContainer.appendChild(brick);
+            }
+        }
+
+        // 开始
+        gameLoop = setInterval(update, 20);
+    }
+
+    function down(e) {
+        if (e.keyCode === 37) {
+            leftPressed = true;
+        } else if (e.keyCode === 39) {
+            rightPressed = true;
+        }
+    }
+
+    function up(e) {
+        if (e.keyCode === 37) {
+            leftPressed = false;
+        } else if (e.keyCode === 39) {
+            rightPressed = false;
+        }
+    }
+
+    function judgeboard() {
+        // 判断球是否碰到边界
+        if (bx < 0 || bx + ball.offsetWidth > board.offsetWidth) {
+            x = -x;
+        }
+        if (by < 0) {
+            y = -y;
+        } else if (by + ball.offsetHeight > board.offsetHeight) {
+            // 判断球是否碰到底部
+            clearInterval(gameLoop);
+            alert("游戏结束，你的得分是：" + score);
+        }
+    }
+    function judgepad() {
+        // 判断球是否碰到挡板
+        if (by + ball.offsetHeight > board.offsetHeight - paddle.offsetHeight && bx + ball.offsetWidth > px && bx < px + paddle.offsetWidth) {
+            y = -y;
+            if (leftPressed) {//增加摩擦效应
+                x = x < 0 ? x : -x;
+            }
+            if (rightPressed) {
+                x = x > 0 ? x : -x;
+            }
+            document.getElementById("score").innerHTML = score;
+        }
+        // 更新挡板位置
+        if (leftPressed && px > 0) {
+            px -= 5;
+        } else if (rightPressed && px + paddle.offsetWidth < board.offsetWidth) {
+            px += 5;
+        }
+        paddle.style.left = px + "px";
+    }
+
+    function judgebrick() {
+        // 判断球是否碰到砖块
+        let count = 0;
+        const bricks = document.getElementsByClassName("brick");
+        for (let i = 0; i < bricks.length; i++) {
+            const brick = bricks[i];
+            if (by < brick.offsetTop + brickHeight && by + ball.offsetHeight > brick.offsetTop && bx + ball.offsetWidth > brick.offsetLeft && bx < brick.offsetLeft + brickWidth) {
+                y = -y;
+                brick.style.display = "none";
+                score++;
+                document.getElementById("score").innerHTML = score;
+            }
+        }
+        for (let i = 0; i < bricks.length; i++) {
+            if (bricks[i].style.display == 'none') {
+                count++;
+            }
+        }
+        if (count == column * row) {
+            clearInterval(gameLoop);
+            alert("恭喜你通关，你的得分是：" + score);
+        }
+    }
+
+    function update() {
+        // 更新球的位置
+        bx += x;
+        by += y;
+        ball.style.left = bx + "px";
+        ball.style.top = by + "px";
+        judgeboard();
+        judgepad();
+        judgebrick();
+    }
+</script>
+
+</html>
